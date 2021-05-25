@@ -6,7 +6,8 @@
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
                  [ring/ring-json "0.5.1"]]
-  :plugins [[lein-ring "0.12.5"]]
+  :plugins [[lein-ring "0.12.5"]
+            [com.jakemccrary/lein-test-refresh "0.24.1"]]
   :ring {:handler chapter2.handler/app
          :nrepl {:start? true
                  :port 60000}}

@@ -27,6 +27,10 @@
     {:body (tasks/add-task task)})
   (DELETE "/api/tasks/:task-id" [task-id]
     {:body (tasks/remove-task (Integer/parseInt task-id))})
+  (PUT "/api/tasks/:task-id/complete" [task-id]
+    {:body (tasks/mark-complete (Integer/parseInt task-id))})
+  (PUT "/api/tasks/:task-id/incomplete" [task-id]
+    {:body (tasks/mark-incomplete (Integer/parseInt task-id))})
   (GET "/api/server-error" [] (/ 0 1)) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
   (route/not-found "Not Found"))
 
