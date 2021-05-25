@@ -1,5 +1,5 @@
-(ns chapter2.handler
-  (:require [chapter2.core :as tasks]
+(ns todo.handler
+  (:require [todo.core :as tasks]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]

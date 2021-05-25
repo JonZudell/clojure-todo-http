@@ -1,6 +1,6 @@
-(ns chapter2.core-test
+(ns todo.core-test
   (:require [clojure.test :refer :all]
-            [chapter2.core :refer :all]))
+            [todo.core :refer :all]))
 
 (defn reset-long [n] (- n n))
 (defn clear-tasks-fixture [f] 

@@ -1,4 +1,4 @@
-(defproject chapter2 "0.1.0-SNAPSHOT"
+(defproject todo "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
@@ -8,10 +8,10 @@
                  [ring/ring-json "0.5.1"]]
   :plugins [[lein-ring "0.12.5"]
             [com.jakemccrary/lein-test-refresh "0.24.1"]]
-  :ring {:handler chapter2.handler/app
+  :ring {:handler todo.handler/app
          :nrepl {:start? true
                  :port 60000}}
-  :main chapter2.core
+  :main todo.core
   :profiles
   {:dev {:dependencies [[clj-http "3.12.0"]
                         [javax.servlet/servlet-api "2.5"]

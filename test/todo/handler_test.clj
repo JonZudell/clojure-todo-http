@@ -1,8 +1,8 @@
-(ns chapter2.handler-test
+(ns todo.handler-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock]
-            [chapter2.handler :refer :all]
-            [chapter2.core :refer :all]))
+            [todo.handler :refer :all]
+            [todo.core :refer :all]))
 
 (defn reset-long
   [n]
