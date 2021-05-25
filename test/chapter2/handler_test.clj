@@ -4,7 +4,13 @@
             [chapter2.handler :refer :all]
             [chapter2.core :refer :all]))
 
-(defn clear-tasks-fixture [f] (swap! tasks empty) (f))
+(defn reset-long
+  [n]
+  (- n n))
+(defn clear-tasks-fixture [f]
+  (swap! tasks empty)
+  (swap! id-atom reset-long)
+  (f))
 (use-fixtures :each clear-tasks-fixture)
 
 (deftest test-app
