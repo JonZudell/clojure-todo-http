@@ -1,7 +1,8 @@
 (ns todo.handler
   (:require [todo.core :as tasks]
-            [compojure.core :refer :all]
+            [compojure.core :refer [routes wrap-routes GET PUT POST DELETE]]
             [compojure.route :as route]
+            [ring.middleware.cookies :refer [wrap-cookies]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response]]
             [ring.util.response :as ring-response]))
@@ -15,26 +16,37 @@
            (-> (ring-response/response (.getMessage e))
                (ring-response/status 500)
                (ring-response/content-type "text/plain")
-               (ring-response/charset "utf-8"))))
-    )
-  )
+               (ring-response/charset "utf-8"))))))
+(defn authorized? [request]
+  (if (not (nil? (-> request :cookies :user)))
+    true
+    false))
 
-(defroutes api-routes
-  (GET "/api/tasks" [] 
-    {:body (tasks/get-tasks)})
-  (POST "/api/tasks" {{task :task} :params}
-    {:body (tasks/add-task task)})
-  (DELETE "/api/tasks/:task-id" [task-id]
-    {:body (tasks/remove-task (Integer/parseInt task-id))})
-  (PUT "/api/tasks/:task-id/complete" [task-id]
-    {:body (tasks/mark-complete (Integer/parseInt task-id))})
-  (PUT "/api/tasks/:task-id/incomplete" [task-id]
-    {:body (tasks/mark-incomplete (Integer/parseInt task-id))})
-  (GET "/api/server-error" [] (/ 0 1)) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
-  (route/not-found "Not Found"))
+(defn wrap-auth
+  "If :cookies doesn't contain user."
+  [handler]
+  (fn [request]
+    (if (authorized? request)
+      (handler request)
+      (-> (ring-response/response "Access Denied")
+          (ring-response/status 403)))))
 
-(def app 
-  (wrap-500-catchall
-   (-> api-routes
-       (wrap-defaults api-defaults)
-       wrap-json-response)))
+(def api-routes 
+  (routes (GET "/api/tasks" [] {:body (tasks/get-tasks)})
+          (POST "/api/tasks" {{task :task} :params} {:body (tasks/add-task task)})
+          (DELETE "/api/tasks/:task-id" [task-id] {:body (tasks/remove-task (Integer/parseInt task-id))})
+          (PUT "/api/tasks/:task-id/complete" [task-id] {:body (tasks/mark-complete (Integer/parseInt task-id))})
+          (PUT "/api/tasks/:task-id/incomplete" [task-id] {:body (tasks/mark-incomplete (Integer/parseInt task-id))}))) ;; without the posibility to pass login this returns 404 because (/ 0 1) is not evaluated
+
+(def non-api-routes 
+  (routes (GET "/login" [] ()) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
+          (GET "/api/server-error" [] (/ 0 1))
+          (route/not-found "Not Found")))
+
+(def app
+     (-> (routes (wrap-routes api-routes
+                              wrap-auth)
+                 (-> non-api-routes)
+                 (route/not-found "Not Found"))
+         wrap-cookies
+         wrap-500-catchall))

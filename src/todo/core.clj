@@ -1,7 +1,7 @@
 (ns todo.core)
 
-(def id-atom (atom 0)); Atoms are mutable state
-(defn next-id [] (swap! id-atom inc)); function that increments the value of the mutable id-atom
+(def id-atom (atom 0)) ;; Atoms are mutable state
+(defn next-id [] (swap! id-atom inc)) ;; function that increments the value of the mutable id-atom
 
 (def tasks (atom (sorted-map)))
 

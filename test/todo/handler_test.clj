@@ -15,9 +15,9 @@
 
 (deftest test-app
   (testing "main route"
-    (let [response (handler/app (mock/request :get "/api/tasks"))]
+    (let [response (handler/app (mock/request :get "/login"))]
       (is (= (:status response) 200))
-      (is (= (:body response) "{}"))))
+      (is (= (:body response) ()))))
   (testing "not-found route"
     (let [response (handler/app (mock/request :get "/invalid"))]
       (is (= (:status response) 404)))))
@@ -25,4 +25,8 @@
 (deftest test-middleware
   (testing "catch exception return 500" 
     (let [response (handler/app (mock/request :get "/api/server-error"))]
-      (is (= (:status response) 500)))))
+      (is (= (:status response) 500))))
+  (testing "login required" 
+    (let [response (handler/app (mock/request :get "/api/tasks"))]
+      (is (= (:status response) 403)))))
+
