@@ -1,30 +1,30 @@
 (ns todo.core-test
-  (:require [clojure.test :refer :all]
-            [todo.core :refer :all]))
+  (:require [clojure.test :refer [use-fixtures deftest testing is]]
+            [todo.core :as tasks]))
 
 (defn reset-long [n] (- n n))
 (defn clear-tasks-fixture [f] 
-  (swap! tasks empty)
-  (swap! id-atom reset-long)
+  (swap! tasks/tasks empty)
+  (swap! tasks/id-atom reset-long)
   (f))
 (use-fixtures :each clear-tasks-fixture)
 
 (deftest test-get-tasks
   (testing "No tasks."
-    (is (empty? (get-tasks))))
+    (is (empty? (tasks/get-tasks))))
   (testing "Add/Remove Tasks"
-    (add-task "Task One")
-    (is (= 1 (count (get-tasks))))
-    (add-task "Task Two")
-    (is (= 2 (count (get-tasks))))
-    (remove-task 1)
-    (is (= 1 (count (get-tasks))))))
+    (tasks/add-task "Task One")
+    (is (= 1 (count (tasks/get-tasks))))
+    (tasks/add-task "Task Two")
+    (is (= 2 (count (tasks/get-tasks))))
+    (tasks/remove-task 1)
+    (is (= 1 (count (tasks/get-tasks))))))
 
 (deftest test-mark-completion
   (testing "Test Complete"
-    (add-task "Task One")
-    (mark-complete 1)
-    (is (= {:task "Task One" :complete true} (get-task 1))))
+    (tasks/add-task "Task One")
+    (tasks/mark-complete 1)
+    (is (= {:task "Task One" :complete true} (tasks/get-task 1))))
   (testing "Test Incomplete"
-    (mark-incomplete 1)
-    (is (= {:task "Task One" :complete false} (get-task 1)))))
+    (tasks/mark-incomplete 1)
+    (is (= {:task "Task One" :complete false} (tasks/get-task 1)))))
