@@ -12,7 +12,11 @@
     (let [response (app (mock/request :get "/api/tasks"))]
       (is (= (:status response) 200))
       (is (= (:body response) "{}"))))
-
   (testing "not-found route"
     (let [response (app (mock/request :get "/invalid"))]
       (is (= (:status response) 404)))))
+
+(deftest test-middleware
+  (testing "catch exception return 500" 
+    (let [response (app (mock/request :get "/api/server-error"))]
+      (is (= (:status response) 500)))))

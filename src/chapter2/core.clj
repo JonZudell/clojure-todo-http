@@ -9,7 +9,7 @@
   "Get all tasks on the to-do list"
   []
   @tasks)
-()
+
 (defn add-task
   "Add a task to the to-do list. Accepts a string describing the task."
   [task]
