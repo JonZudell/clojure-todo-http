@@ -29,19 +29,37 @@
                                   (request "/invalid")))]
       (is (= (:status response) 404)))))
 
+(deftest test-unique-for-user
+  (testing "steves tasks"
+    (let [response (:response (-> (session app)
+                                  (request "/login" 
+                                           :request-method :post 
+                                           :params {:user "steve"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "tax"})
+                                  (request "/api/tasks")
+                                  ))]
+      (is (= () (:body response))))))
+
 (deftest test-middleware
-  (testing "catch exception return 500" 
+  (testing "should catch exception return 500" 
     (let [response (:response (-> (session app)
                                   (request "/api/server-error")))]
       (is (= (:status response) 500))))
-  (testing "login required" 
+  
+  (testing "should return 403" 
     (let [response (:response (-> (session app)
-                                  (request "/api/tasks")))]
+                                  (request "/api/tasks"
+                                            :request-method :get)))]
       (is (= (:status response) 403))))
-  (testing "login works"
+  
+  (testing "should be able to create task"
     (let [response (:response (-> (session app)
                                   (request "/login"
                                            :request-method :post
                                            :params {:user "bob"})
-                                  (request "/api/tasks")))]
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "tax"})))]
       (is (= (:status response) 200)))))

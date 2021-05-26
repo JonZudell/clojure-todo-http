@@ -18,16 +18,27 @@
                (ring-response/content-type "text/plain")
                (ring-response/charset "utf-8"))))))
 
-(defn whoami [request]
-  {:body (-> request :session :user)})
-
+(defn whoami [request] (-> request :session :user))
+(defn parse-task [request] (-> request
+                               :task
+                               :params))
 (def protected-routes 
-  (routes (GET "/api/whoami" [] whoami)
-          (GET "/api/tasks" [] {:body (tasks/get-tasks whoami)})
-          (POST "/api/tasks" {{task :task} :params} {:body (tasks/add-task whoami task)})
-          (DELETE "/api/tasks/:task-id" [task-id] {:body (tasks/remove-task whoami (Integer/parseInt task-id))})
-          (PUT "/api/tasks/:task-id/complete" [task-id] {:body (tasks/mark-complete whoami (Integer/parseInt task-id))})
-          (PUT "/api/tasks/:task-id/incomplete" [task-id] {:body (tasks/mark-incomplete whoami (Integer/parseInt task-id))}))) ;; without the posibility to pass login this returns 404 because (/ 0 1) is not evaluated
+  (routes (GET "/api/whoami" request  
+            {:body (whoami request)})
+          (GET "/api/tasks" 
+            request {:body (tasks/get-tasks (whoami request))})
+          (POST "/api/tasks" 
+            request {:body (tasks/add-task (whoami request) 
+                                           (parse-task request))})
+          (DELETE "/api/tasks/:task-id" 
+            request {:body (tasks/remove-task (whoami request) 
+                                              (Integer/parseInt (:task-id request)))})
+          (PUT "/api/tasks/:task-id/complete" 
+            request {:body (tasks/mark-complete (whoami request) 
+                                                (Integer/parseInt (:task-id request)))})
+          (PUT "/api/tasks/:task-id/incomplete" 
+            request {:body (tasks/mark-incomplete (whoami request) 
+                                                  (Integer/parseInt (:task-id request)))}))) ;; without the posibility to pass login this returns 404 because (/ 0 1) is not evaluated
 
 (defn login [request]
   (let [user (get-in request [:params :user])
@@ -45,7 +56,7 @@
     false))
 
 (defn wrap-auth
-  "If :cookies doesn't contain user."
+  "If :session doesn't contain user. Return Access Denied. Otherwise call next handler"
   [handler]
   (fn [request]
     (if (authorized? request)
@@ -55,9 +66,9 @@
 
 (def app
      (-> (routes (-> protected-routes 
-                     (wrap-routes wrap-auth)
-                     (wrap-routes wrap-json-response)) ;; wrap-routes gotcha
+                     (wrap-routes wrap-auth)) ;; wrap-routes gotcha
                  unprotected-routes)
-         wrap-session
+         wrap-json-response
          wrap-500-catchall
+         wrap-session
          (wrap-defaults api-defaults)))
