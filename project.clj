@@ -15,4 +15,5 @@
   :profiles
   {:dev {:dependencies [[clj-http "3.12.0"]
                         [javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.2"]]}})
+                        [ring/ring-mock "0.3.2"]
+                        [peridot "0.5.3"]]}})

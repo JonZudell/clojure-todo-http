@@ -1,8 +1,8 @@
 (ns todo.handler-test
   (:require [clojure.test :refer [use-fixtures deftest testing is]]
-            [ring.mock.request :as mock]
-            [todo.handler :as handler]
-            [todo.core :as core]))
+            [todo.handler :refer [app]]
+            [todo.core :as core]
+            [peridot.core :refer [request session]]))
 
 (defn reset-long
   [n]
@@ -15,18 +15,26 @@
 
 (deftest test-app
   (testing "main route"
-    (let [response (handler/app (mock/request :get "/login"))]
+    (let [response (:response (-> (session app)
+                                  (request "/login" 
+                                           :request-method :post 
+                                           :params {:user "bob"})
+                                  (request "/api/whoami")))]
       (is (= (:status response) 200))
-      (is (= (:body response) ()))))
+      (is (= (:body response) "bob"))
+      (not (nil? (:session response)))))
+  
   (testing "not-found route"
-    (let [response (handler/app (mock/request :get "/invalid"))]
+    (let [response (:response (-> (session app)
+                                  (request "/invalid")))]
       (is (= (:status response) 404)))))
 
 (deftest test-middleware
   (testing "catch exception return 500" 
-    (let [response (handler/app (mock/request :get "/api/server-error"))]
+    (let [response (:response (-> (session app)
+                                  (request "/api/server-error")))]
       (is (= (:status response) 500))))
   (testing "login required" 
-    (let [response (handler/app (mock/request :get "/api/tasks"))]
+    (let [response (:response (-> (session app)
+                                  (request "/api/tasks")))]
       (is (= (:status response) 403)))))
-
