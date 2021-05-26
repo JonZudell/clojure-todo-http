@@ -2,7 +2,8 @@
   (:require [clojure.test :refer [use-fixtures deftest testing is]]
             [todo.handler :refer [app]]
             [todo.core :as core]
-            [peridot.core :refer [request session]]))
+            [peridot.core :refer [request session]]
+            [cheshire.core :as json]))
 
 (defn reset-long
   [n]
@@ -37,10 +38,38 @@
                                            :params {:user "steve"})
                                   (request "/api/tasks"
                                            :request-method :post
-                                           :params {:task "tax"})
-                                  (request "/api/tasks")
-                                  ))]
-      (is (= () (:body response))))))
+                                           :params {:task "tax 1"})
+                                  (request "/api/tasks")))]
+      (is (= {"1" {"task" "tax 1"}} 
+             (json/parse-string (:body response))))))
+  (testing "bobs tasks"
+    (let [response (:response (-> (session app)
+                                  (request "/login"
+                                           :request-method :post
+                                           :params {:user "bob"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "garbage 1"})
+                                  (request "/api/tasks")))]
+      (is (= {"2" {"task" "garbage 1"}} 
+             (json/parse-string (:body response))))))
+  (testing "steve bob exclusive"
+    (let [response (:response (-> (session app)
+                                  (request "/login"
+                                           :request-method :post
+                                           :params {:user "steve"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "tax 2"})
+                                  (request "/login"
+                                           :request-method :post
+                                           :params {:user "bob"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "garbage 2"})
+                                  (request "/api/tasks")))]
+      (is (= {"2" {"task" "garbage 1"} "4" {"task" "garbage 2"}} 
+             (json/parse-string (:body response)))))))
 
 (deftest test-middleware
   (testing "should catch exception return 500" 

@@ -19,9 +19,6 @@
                (ring-response/charset "utf-8"))))))
 
 (defn whoami [request] (-> request :session :user))
-(defn parse-task [request] (-> request
-                               :task
-                               :params))
 (def protected-routes 
   (routes (GET "/api/whoami" request  
             {:body (whoami request)})
@@ -29,7 +26,9 @@
             request {:body (tasks/get-tasks (whoami request))})
           (POST "/api/tasks" 
             request {:body (tasks/add-task (whoami request) 
-                                           (parse-task request))})
+                                           (-> request 
+                                               :params
+                                               :task))})
           (DELETE "/api/tasks/:task-id" 
             request {:body (tasks/remove-task (whoami request) 
                                               (Integer/parseInt (:task-id request)))})
