@@ -17,6 +17,7 @@
                (ring-response/status 500)
                (ring-response/content-type "text/plain")
                (ring-response/charset "utf-8"))))))
+
 (defn authorized? [request]
   (if (not (nil? (-> request :cookies :user)))
     true
@@ -31,22 +32,23 @@
       (-> (ring-response/response "Access Denied")
           (ring-response/status 403)))))
 
-(def api-routes 
+(def protected-routes 
   (routes (GET "/api/tasks" [] {:body (tasks/get-tasks)})
           (POST "/api/tasks" {{task :task} :params} {:body (tasks/add-task task)})
           (DELETE "/api/tasks/:task-id" [task-id] {:body (tasks/remove-task (Integer/parseInt task-id))})
           (PUT "/api/tasks/:task-id/complete" [task-id] {:body (tasks/mark-complete (Integer/parseInt task-id))})
           (PUT "/api/tasks/:task-id/incomplete" [task-id] {:body (tasks/mark-incomplete (Integer/parseInt task-id))}))) ;; without the posibility to pass login this returns 404 because (/ 0 1) is not evaluated
 
-(def non-api-routes 
-  (routes (GET "/login" [] ()) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
-          (GET "/api/server-error" [] (/ 0 1))
+(def unprotected-routes 
+  (routes (GET "/login" [] ()) 
+          (GET "/api/server-error" [] (/ 0 1)) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
           (route/not-found "Not Found")))
 
 (def app
-     (-> (routes (wrap-routes api-routes
-                              wrap-auth)
-                 (-> non-api-routes)
-                 (route/not-found "Not Found"))
+     (-> (routes (-> protected-routes 
+                     (wrap-routes wrap-auth)
+                     (wrap-routes wrap-json-response)) ;; wrap-routes gotcha
+                 unprotected-routes)
          wrap-cookies
-         wrap-500-catchall))
+         wrap-500-catchall
+         (wrap-defaults api-defaults)))
