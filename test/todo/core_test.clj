@@ -11,20 +11,21 @@
 
 (deftest test-get-tasks
   (testing "No tasks."
-    (is (empty? (tasks/get-tasks))))
+    (is (empty? (tasks/get-tasks "bob"))))
   (testing "Add/Remove Tasks"
-    (tasks/add-task "Task One")
-    (is (= 1 (count (tasks/get-tasks))))
-    (tasks/add-task "Task Two")
-    (is (= 2 (count (tasks/get-tasks))))
-    (tasks/remove-task 1)
-    (is (= 1 (count (tasks/get-tasks))))))
+    (tasks/add-task "bob" "Task One")
+    (is (= 1 (count (tasks/get-tasks "bob"))))
+    (tasks/add-task "steve" "Task Two")
+    (is (= 1 (count (tasks/get-tasks "bob"))))
+    (tasks/remove-task "bob" 1)
+    (is (= 0 (count (tasks/get-tasks "bob"))))
+    (is(= ["bob" "steve"](tasks/get-task-lists)))))
 
 (deftest test-mark-completion
   (testing "Test Complete"
-    (tasks/add-task "Task One")
-    (tasks/mark-complete 1)
-    (is (= {:task "Task One" :complete true} (tasks/get-task 1))))
+    (tasks/add-task "bob" "Task One")
+    (tasks/mark-complete "bob" 1)
+    (is (= {:task "Task One" :complete true} (tasks/get-task "bob" 1))))
   (testing "Test Incomplete"
-    (tasks/mark-incomplete 1)
-    (is (= {:task "Task One" :complete false} (tasks/get-task 1)))))
+    (tasks/mark-incomplete "bob" 1)
+    (is (= {:task "Task One" :complete false} (tasks/get-task "bob" 1)))))

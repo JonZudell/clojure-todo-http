@@ -22,11 +22,12 @@
   {:body (-> request :session :user)})
 
 (def protected-routes 
-  (routes (GET "/api/whoami" [] whoami)(GET "/api/tasks" [] {:body (tasks/get-tasks)})
-          (POST "/api/tasks" {{task :task} :params} {:body (tasks/add-task task)})
-          (DELETE "/api/tasks/:task-id" [task-id] {:body (tasks/remove-task (Integer/parseInt task-id))})
-          (PUT "/api/tasks/:task-id/complete" [task-id] {:body (tasks/mark-complete (Integer/parseInt task-id))})
-          (PUT "/api/tasks/:task-id/incomplete" [task-id] {:body (tasks/mark-incomplete (Integer/parseInt task-id))}))) ;; without the posibility to pass login this returns 404 because (/ 0 1) is not evaluated
+  (routes (GET "/api/whoami" [] whoami)
+          (GET "/api/tasks" [] {:body (tasks/get-tasks whoami)})
+          (POST "/api/tasks" {{task :task} :params} {:body (tasks/add-task whoami task)})
+          (DELETE "/api/tasks/:task-id" [task-id] {:body (tasks/remove-task whoami (Integer/parseInt task-id))})
+          (PUT "/api/tasks/:task-id/complete" [task-id] {:body (tasks/mark-complete whoami (Integer/parseInt task-id))})
+          (PUT "/api/tasks/:task-id/incomplete" [task-id] {:body (tasks/mark-incomplete whoami (Integer/parseInt task-id))}))) ;; without the posibility to pass login this returns 404 because (/ 0 1) is not evaluated
 
 (defn login [request]
   (let [user (get-in request [:params :user])

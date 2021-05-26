@@ -37,4 +37,11 @@
   (testing "login required" 
     (let [response (:response (-> (session app)
                                   (request "/api/tasks")))]
-      (is (= (:status response) 403)))))
+      (is (= (:status response) 403))))
+  (testing "login works"
+    (let [response (:response (-> (session app)
+                                  (request "/login"
+                                           :request-method :post
+                                           :params {:user "bob"})
+                                  (request "/api/tasks")))]
+      (is (= (:status response) 200)))))
