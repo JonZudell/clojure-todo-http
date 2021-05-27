@@ -45,7 +45,7 @@
      {:body "Success" :session (assoc session :user user)}))
 
 (def unprotected-routes 
-  (routes (POST "/login" {{user :user} :params} login) 
+  (routes (POST "/login" request login) 
           (GET "/api/server-error" [] (/ 0 1)) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
           (route/not-found "Not Found")))
 

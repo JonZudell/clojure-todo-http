@@ -2,10 +2,18 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
+  :repositories {"cognitect-dev-tools"
+                 {:url "https://dev-tools.cognitect.com/maven/releases/"
+                  :creds :gpg}
+                 "my.datomic.com"
+                 {:url "https://my.datomic.com/repo"
+                  :creds :gpg}}
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
-                 [ring/ring-json "0.5.1"]]
+                 [ring/ring-json "0.5.1"]
+                 [com.datomic/datomic-pro "1.0.6269"]
+                 [com.datomic/client-cloud "0.8.105"]]
   :plugins [[lein-ring "0.12.5"]
             [com.jakemccrary/lein-test-refresh "0.24.1"]]
   :ring {:handler todo.handler/app

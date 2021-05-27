@@ -19,7 +19,7 @@
     (is (= 1 (count (tasks/get-tasks "bob"))))
     (tasks/remove-task "bob" 1)
     (is (= 0 (count (tasks/get-tasks "bob"))))
-    (is(= ["bob" "steve"](tasks/get-task-lists)))))
+    (is (= ["bob" "steve"](tasks/get-task-lists)))))
 
 (deftest test-mark-completion
   (testing "Test Complete"

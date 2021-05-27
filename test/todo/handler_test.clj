@@ -5,9 +5,7 @@
             [peridot.core :refer [request session]]
             [cheshire.core :as json]))
 
-(defn reset-long
-  [n]
-  (- n n))
+(defn reset-long [n] (- n n))
 (defn clear-tasks-fixture [f]
   (swap! core/tasks empty)
   (swap! core/id-atom reset-long)
@@ -29,6 +27,28 @@
     (let [response (:response (-> (session app)
                                   (request "/invalid")))]
       (is (= (:status response) 404)))))
+
+(deftest test-middleware
+  (testing "should catch exception return 500"
+    (let [response (:response (-> (session app)
+                                  (request "/api/server-error")))]
+      (is (= (:status response) 500))))
+
+  (testing "should return 403"
+    (let [response (:response (-> (session app)
+                                  (request "/api/tasks"
+                                           :request-method :get)))]
+      (is (= (:status response) 403))))
+
+  (testing "should be able to create task"
+    (let [response (:response (-> (session app)
+                                  (request "/login"
+                                           :request-method :post
+                                           :params {:user "bob"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "tax"})))]
+      (is (= (:status response) 200)))))
 
 (deftest test-unique-for-user
   (testing "steves tasks"
@@ -70,25 +90,3 @@
                                   (request "/api/tasks")))]
       (is (= {"2" {"task" "garbage 1"} "4" {"task" "garbage 2"}} 
              (json/parse-string (:body response)))))))
-
-(deftest test-middleware
-  (testing "should catch exception return 500" 
-    (let [response (:response (-> (session app)
-                                  (request "/api/server-error")))]
-      (is (= (:status response) 500))))
-  
-  (testing "should return 403" 
-    (let [response (:response (-> (session app)
-                                  (request "/api/tasks"
-                                            :request-method :get)))]
-      (is (= (:status response) 403))))
-  
-  (testing "should be able to create task"
-    (let [response (:response (-> (session app)
-                                  (request "/login"
-                                           :request-method :post
-                                           :params {:user "bob"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "tax"})))]
-      (is (= (:status response) 200)))))
