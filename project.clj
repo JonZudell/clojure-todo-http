@@ -12,8 +12,7 @@
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
                  [ring/ring-json "0.5.1"]
-                 [com.datomic/datomic-pro "1.0.6269"]
-                 [com.datomic/client-cloud "0.8.105"]]
+                 [com.datomic/dev-local "0.9.232"]]
   :plugins [[lein-ring "0.12.5"]
             [com.jakemccrary/lein-test-refresh "0.24.1"]]
   :ring {:handler todo.handler/app
