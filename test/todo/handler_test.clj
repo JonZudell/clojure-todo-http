@@ -2,7 +2,14 @@
   (:require [clojure.test :refer [use-fixtures deftest testing is]]
             [todo.handler :refer [app]]
             [peridot.core :refer [request session]]
-            [cheshire.core :as json]))
+            [cheshire.core :as json]
+            [todo.db :as db]))
+
+(defn clear-tasks-fixture [f]
+  (db/start)
+  (f)
+  (db/stop))
+(use-fixtures :each clear-tasks-fixture)
 
 (deftest test-app
   (testing "main route"

@@ -1,26 +1,26 @@
-(ns todo.core
-  (:require [datomic.client.api :as d]))
+(ns todo.core (:require [datomic.client.api :as d]
+                        [todo.db :as db]))
 
 (defn get-tasks
   "Get all tasks on the to-do list"
-  [list-name])
+  [user])
 
 (defn add-task
   "Add a task to the to-do list. Accepts a string describing the task."
-  [list-name task])
+  [user task])
 
 (defn get-task
   "Get single task by id."
-  [list-name task-id])
+  [user task-id])
 
 (defn remove-task
   "Removes a task from the to-do list. Accepts the id of the task to remove."
-  [list-name task-id])
+  [user task-id])
 
 (defn mark-complete
   "Marks a task incomplete. Accepts task-id."
-  [list-name task-id])
+  [user task-id])
 
 (defn mark-incomplete
   "Marks a task incomplete. Accepts task-id."
-  [list-name task-id])
+  [user task-id])
