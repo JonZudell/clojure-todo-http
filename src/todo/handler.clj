@@ -1,5 +1,5 @@
 (ns todo.handler
-  (:require [todo.core :as tasks]
+  (:require [todo.core :as core]
             [compojure.core :refer [routes wrap-routes GET PUT POST DELETE]]
             [compojure.route :as route]
             [ring.middleware.session :refer [wrap-session]]
@@ -23,20 +23,20 @@
   (routes (GET "/api/whoami" request  
             {:body (whoami request)})
           (GET "/api/tasks" 
-            request {:body (tasks/get-tasks (whoami request))})
+            request {:body (core/get-tasks (whoami request))})
           (POST "/api/tasks" 
-            request {:body (tasks/add-task (whoami request) 
+            request {:body (core/add-task (whoami request) 
                                            (-> request 
                                                :params
                                                :task))})
           (DELETE "/api/tasks/:task-id" 
-            request {:body (tasks/remove-task (whoami request) 
+            request {:body (core/remove-task (whoami request) 
                                               (Integer/parseInt (:task-id request)))})
           (PUT "/api/tasks/:task-id/complete" 
-            request {:body (tasks/mark-complete (whoami request) 
+            request {:body (core/mark-complete (whoami request) 
                                                 (Integer/parseInt (:task-id request)))})
           (PUT "/api/tasks/:task-id/incomplete" 
-            request {:body (tasks/mark-incomplete (whoami request) 
+            request {:body (core/mark-incomplete (whoami request) 
                                                   (Integer/parseInt (:task-id request)))}))) ;; without the posibility to pass login this returns 404 because (/ 0 1) is not evaluated
 
 (defn login [request]

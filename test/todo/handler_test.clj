@@ -1,16 +1,8 @@
 (ns todo.handler-test
   (:require [clojure.test :refer [use-fixtures deftest testing is]]
             [todo.handler :refer [app]]
-            [todo.core :as core]
             [peridot.core :refer [request session]]
             [cheshire.core :as json]))
-
-(defn reset-long [n] (- n n))
-(defn clear-tasks-fixture [f]
-  (swap! core/tasks empty)
-  (swap! core/id-atom reset-long)
-  (f))
-(use-fixtures :each clear-tasks-fixture)
 
 (deftest test-app
   (testing "main route"
