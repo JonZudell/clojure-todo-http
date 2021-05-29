@@ -16,11 +16,11 @@
     (core/remove-task "bob" 1)
     (is (= 0 (count (core/get-tasks "bob"))))))
 
-(deftest test-mark-completion
-  (testing "Test Complete"
-    (core/add-task "bob" "Task One")
-    (core/mark-complete "bob" 1)
-    (is (= {:task "Task One" :complete true} (core/get-task "bob" 1))))
-  (testing "Test Incomplete"
-    (core/mark-incomplete "bob" 1)
-    (is (= {:task "Task One" :complete false} (core/get-task "bob" 1)))))
+;;(deftest test-mark-completion
+;;  (testing "Test Complete"
+;;    (core/add-task "bob" "Task One")
+;;    (core/mark-complete "bob" 1)
+;;    (is (= {:task "Task One" :complete true} (core/get-task "bob" 1))))
+;;  (testing "Test Incomplete"
+;;    (core/mark-incomplete "bob" 1)
+;;    (is (= {:task "Task One" :complete false} (core/get-task "bob" 1)))))

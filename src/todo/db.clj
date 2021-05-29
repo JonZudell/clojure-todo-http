@@ -26,6 +26,7 @@
 (defn create-db []
   (let [ _ (d/create-database client {:db-name  "todo-tasks"})
         conn (d/connect client {:db-name "todo-tasks"})]
+    (d/transact conn {:tx-data schema})
     conn))
 
 (defn start

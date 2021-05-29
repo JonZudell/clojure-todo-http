@@ -36,8 +36,8 @@
 
 (def app
      (-> (routes (-> protected-routes
-                     (wrap-routes wrap-auth)
-                     (wrap-routes wrap-conn)) ;; wrap-routes gotcha
+                     (wrap-routes wrap-conn)
+                     (wrap-routes wrap-auth)) ;; wrap-routes gotcha
                  unprotected-routes)
          wrap-json-response
          wrap-500-catchall
