@@ -5,12 +5,6 @@
               :db/valueType :db.type/string
               :db/cardinality :db.cardinality/one
               :db/doc "user that authored the task"}
-             
-             ;; {:db/ident :task/external-use-id
-             ;;  :db/valueType :db.type/uuid
-             ;;  :db/cardinality :db.cardinality/one
-             ;;  :db/doc "an id for external use"
-             ;;  :db/unique :db.unique/identity}
 
              {:db/ident :task/description
               :db/cardinality :db.cardinality/one
@@ -37,6 +31,12 @@
 (defn start
   []
   (alter-var-root #'conn (constantly (create-db)))) ;; alter-var-root is an atomic operation
+
 (defn stop
   []
   (d/delete-database client {:db-name "todo-tasks"}))
+
+(defn fixture-setup [f]
+  (start)
+  (f)
+  (stop))
