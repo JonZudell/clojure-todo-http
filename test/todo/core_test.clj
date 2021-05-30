@@ -29,4 +29,12 @@
           (core/get-task
            (core/mark-incomplete
             (core/mark-complete
-             (core/add-task "bob" "Task One")))))))))
+             (core/add-task "bob" "Task Two"))))))))
+  (testing "Test Counts"
+    (is (= [1] (core/get-complete-counts "bob")))
+    (is (= [1] (core/get-incomplete-counts "bob")))
+    (core/mark-complete (core/add-task "bob" "Task Three"))
+    (is (= [2] (core/get-complete-counts "bob")))
+    (is (= [1] (core/get-incomplete-counts "bob")))
+    (core/add-task "bob" "Task Four")
+    (is (= [2] (core/get-incomplete-counts "bob")))))

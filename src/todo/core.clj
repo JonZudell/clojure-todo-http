@@ -19,8 +19,30 @@
          [?t :task/description ?description]
          [?t :task/completed ?completed]
          [?t :task/deleted false]]
-
        (d/db db/conn) user))
+
+(defn get-complete-counts
+  "Get a map showing counts of (complete or deleted )/incomplete tasks."
+  [user]
+  (first (d/q '[:find (count ?complete)
+                :with ?c
+                :in $ ?user
+                :where [?c :task/user ?user]
+                [?c :task/completed true]
+                [?c :task/completed ?complete]]
+       (d/db db/conn) user)))
+
+(defn get-incomplete-counts
+  "Get a map showing counts of (complete or deleted )/incomplete tasks."
+  [user]
+  (first (d/q '[:find (count ?incomplete)
+                :with ?i
+                :in $ ?user
+                :where [?i :task/user ?user]
+                [?i :task/completed false]
+                [?i :task/completed ?incomplete]]
+              (d/db db/conn) user)))
+
 
 (defn add-task
   "Add a task to Datomic."
