@@ -11,6 +11,9 @@
   (testing "Add/Remove Tasks"
     (core/remove-task (core/add-task "bob" "Task One"))
     (is (= 0 (count (core/get-tasks "bob")))))
+  (testing "Add Tasks"
+    (core/add-task "steve" "scuba")
+    (is (= 1 (count (core/get-tasks "steve")))))
   (testing "Get Task"
     (is (not (nil? (core/get-task (core/add-task "bob" "Task One")))))))
 
@@ -18,9 +21,8 @@
   (testing "Test Complete"
     (is (:task/completed
          (core/get-task
-          (core/mark-incomplete
-           (core/mark-complete
-            (core/add-task "bob" "Task One")))))))
+          (core/mark-complete
+           (core/add-task "bob" "Task One"))))))
   (testing "Test Incomplete"
     (is (not 
          (:task/completed

@@ -3,10 +3,12 @@
 (defn get-task 
   "Get a single task by external use id"
   [external-use-id]
-  (d/q '[:find (pull ?t [*])
-         :in $ ?external-use-id
-         :where [?t :task/external-use-id ?external-use-id]]
-       (d/db db/conn) external-use-id))
+  (-> (d/q '[:find (pull ?t [*])
+             :in $ ?external-use-id
+             :where [?t :task/external-use-id ?external-use-id]]
+           (d/db db/conn) external-use-id)
+      first
+      first))
 
 (defn get-tasks
   "Get all tasks for a user."
@@ -41,7 +43,7 @@
   external-use-id)
 
 (defn mark-complete
-  "Marks a task incomplete. Accepts task-id."
+  "Marks a task complete. Accepts task-id."
   [external-use-id]
   (d/transact db/conn
               {:tx-data [{:task/external-use-id external-use-id

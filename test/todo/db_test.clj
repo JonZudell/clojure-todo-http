@@ -3,7 +3,6 @@
             [todo.db :as db]
             [datomic.client.api :as d]))
 
-
 (use-fixtures :each db/fixture-setup)
 
 (deftest test-get-tasks
@@ -25,5 +24,3 @@
     (is (= [1]  (first(d/q '[:find (count ?t)
                              :where [?t :task/user "stebe"]]
                            (d/db db/conn)))))))
-
-

@@ -3,8 +3,7 @@
             [todo.handler :refer [app]]
             [peridot.core :refer [request session]]
             [cheshire.core :as json]
-            [todo.db :as db]
-            [clojure.edn :as edn]))
+            [todo.db :as db]))
 
 (use-fixtures :each db/fixture-setup)
 
