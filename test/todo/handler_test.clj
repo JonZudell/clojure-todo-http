@@ -1,18 +1,11 @@
 (ns todo.handler-test
   (:require [clojure.test :refer [use-fixtures deftest testing is]]
             [todo.handler :refer [app]]
-            [todo.core :as core]
             [peridot.core :refer [request session]]
-            [cheshire.core :as json]))
+            [cheshire.core :as json]
+            [todo.db :as db]))
 
-(defn reset-long
-  [n]
-  (- n n))
-(defn clear-tasks-fixture [f]
-  (swap! core/tasks empty)
-  (swap! core/id-atom reset-long)
-  (f))
-(use-fixtures :each clear-tasks-fixture)
+(use-fixtures :each db/fixture-setup)
 
 (deftest test-app
   (testing "main route"
@@ -30,6 +23,28 @@
                                   (request "/invalid")))]
       (is (= (:status response) 404)))))
 
+(deftest test-middleware
+  (testing "should catch exception return 500"
+    (let [response (:response (-> (session app)
+                                  (request "/api/server-error")))]
+      (is (= (:status response) 500))))
+
+  (testing "should return 403"
+    (let [response (:response (-> (session app)
+                                  (request "/api/tasks"
+                                           :request-method :get)))]
+      (is (= (:status response) 403))))
+
+  (testing "should be able to create task"
+    (let [response (:response (-> (session app)
+                                  (request "/login"
+                                           :request-method :post
+                                           :params {:user "bob"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "tax"})))]
+      (is (= (:status response) 200)))))
+
 (deftest test-unique-for-user
   (testing "steves tasks"
     (let [response (:response (-> (session app)
@@ -39,9 +54,11 @@
                                   (request "/api/tasks"
                                            :request-method :post
                                            :params {:task "tax 1"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "tax 2"})
                                   (request "/api/tasks")))]
-      (is (= {"1" {"task" "tax 1"}} 
-             (json/parse-string (:body response))))))
+      (is (= 2 (count (json/parse-string (:body response)))))))
   (testing "bobs tasks"
     (let [response (:response (-> (session app)
                                   (request "/login"
@@ -51,8 +68,7 @@
                                            :request-method :post
                                            :params {:task "garbage 1"})
                                   (request "/api/tasks")))]
-      (is (= {"2" {"task" "garbage 1"}} 
-             (json/parse-string (:body response))))))
+      (is (= 1 (count (json/parse-string (:body response)))))))
   (testing "steve bob exclusive"
     (let [response (:response (-> (session app)
                                   (request "/login"
@@ -67,28 +83,8 @@
                                   (request "/api/tasks"
                                            :request-method :post
                                            :params {:task "garbage 2"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "garbage 3"})
                                   (request "/api/tasks")))]
-      (is (= {"2" {"task" "garbage 1"} "4" {"task" "garbage 2"}} 
-             (json/parse-string (:body response)))))))
-
-(deftest test-middleware
-  (testing "should catch exception return 500" 
-    (let [response (:response (-> (session app)
-                                  (request "/api/server-error")))]
-      (is (= (:status response) 500))))
-  
-  (testing "should return 403" 
-    (let [response (:response (-> (session app)
-                                  (request "/api/tasks"
-                                            :request-method :get)))]
-      (is (= (:status response) 403))))
-  
-  (testing "should be able to create task"
-    (let [response (:response (-> (session app)
-                                  (request "/login"
-                                           :request-method :post
-                                           :params {:user "bob"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "tax"})))]
-      (is (= (:status response) 200)))))
+      (is (= 3 (count (json/parse-string (:body response))))))))
