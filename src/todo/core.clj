@@ -56,12 +56,17 @@
                             :task/deleted false}]})
     external-use-id))
 
+;; To simplify some stuff I've decided to complete the task upon deletion
+;; If we want to "undelete" we can see what the stated of completed was.
+;; The transaction that deleted it on execution should contain a retration
+;; for a :task/completed false fact.
 (defn remove-task
   "Removes a task from the to-do list. Accepts the id of the task to remove."
   [external-use-id]
   (d/transact db/conn 
               {:tx-data [{:task/external-use-id external-use-id
-                          :task/deleted true}]})
+                          :task/deleted true
+                          :task/completed true}]})
   external-use-id)
 
 (defn mark-complete
@@ -79,3 +84,17 @@
               {:tx-data [{:task/external-use-id external-use-id
                           :task/completed false}]})
   external-use-id)
+
+(defn complete-history
+  "returns the history of changes to the :task/completed attribute
+   for all task entities belonging to a user"
+  [user]
+  (sort (d/q '[:find ?tx-time ?e ?v ?confirmed-user
+               :in $ ?user ?a
+               :where [?e ?a ?v ?tx true]
+               [?tx :db/txInstant ?tx-time]
+               [?e :task/user ?user]
+               [?e :task/user ?confirmed-user]]
+             (d/history (d/db db/conn))
+             user
+             :task/completed)))

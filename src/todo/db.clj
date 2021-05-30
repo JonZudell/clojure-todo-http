@@ -2,7 +2,7 @@
   (:require [datomic.client.api :as d]))
 
 (defonce schema [{:db/ident :task/external-use-id
-                  :db/valueType :db.type/string
+                  :db/valueType :db.type/string ;; would prefer :db.type/uuid
                   :db/cardinality :db.cardinality/one
                   :db/doc "an id for external use"
                   :db/unique :db.unique/identity}

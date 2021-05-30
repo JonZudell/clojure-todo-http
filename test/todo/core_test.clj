@@ -38,3 +38,22 @@
     (is (= [1] (core/get-incomplete-counts "bob")))
     (core/add-task "bob" "Task Four")
     (is (= [2] (core/get-incomplete-counts "bob")))))
+
+;; Need to thread sleep or Datomic won't mark the history appropriately
+;; Why is this a race condition?
+(deftest test-completion-history
+  (testing "History of changes"
+    (let [external-use-id (core/add-task "bob" "Task One")]
+      (Thread/sleep 5)
+      (core/mark-complete external-use-id)
+      (Thread/sleep 5)
+      (core/mark-incomplete external-use-id))
+    (let [external-use-id (core/add-task "steve" "Task Two")]
+      (Thread/sleep 5)
+      (core/mark-complete external-use-id)
+      (Thread/sleep 5)
+      (core/mark-incomplete external-use-id)
+      (Thread/sleep 5)
+      (core/mark-complete external-use-id)
+    (is (= 3 (count (core/complete-history "bob"))))
+    (is (= 4 (count (core/complete-history "steve")))))))
