@@ -14,8 +14,8 @@
                                     :task/description "tax"
                                     :task/completed false}]})
     (is (= [1]  (first (d/q '[:find (count ?t)
-                            :where [?t :task/user "jon"]]
-                          (d/db db/conn)))))
+                              :where [?t :task/user "jon"]]
+                            (d/db db/conn)))))
     (is (= nil (first(d/q '[:find (count ?t)
                             :where [?t :task/user "stebe"]]
                           (d/db db/conn)))))
@@ -23,7 +23,7 @@
                                     :task/description "sbuba"
                                     :task/completed false}]})
     (is (= [1]  (first(d/q '[:find (count ?t)
-                           :where [?t :task/user "stebe"]]
-                         (d/db db/conn)))))))
+                             :where [?t :task/user "stebe"]]
+                           (d/db db/conn)))))))
 
 

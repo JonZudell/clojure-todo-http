@@ -3,7 +3,8 @@
             [todo.handler :refer [app]]
             [peridot.core :refer [request session]]
             [cheshire.core :as json]
-            [todo.db :as db]))
+            [todo.db :as db]
+            [clojure.edn :as edn]))
 
 (use-fixtures :each db/fixture-setup)
 
@@ -54,9 +55,11 @@
                                   (request "/api/tasks"
                                            :request-method :post
                                            :params {:task "tax 1"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "tax 2"})
                                   (request "/api/tasks")))]
-      (is (= {"1" {"task" "tax 1"}} 
-             (json/parse-string (:body response))))))
+      (is (= 2 (count (json/parse-string (:body response)))))))
   (testing "bobs tasks"
     (let [response (:response (-> (session app)
                                   (request "/login"
@@ -66,8 +69,7 @@
                                            :request-method :post
                                            :params {:task "garbage 1"})
                                   (request "/api/tasks")))]
-      (is (= {"2" {"task" "garbage 1"}} 
-             (json/parse-string (:body response))))))
+      (is (= 1 (count (json/parse-string (:body response)))))))
   (testing "steve bob exclusive"
     (let [response (:response (-> (session app)
                                   (request "/login"
@@ -82,6 +84,8 @@
                                   (request "/api/tasks"
                                            :request-method :post
                                            :params {:task "garbage 2"})
+                                  (request "/api/tasks"
+                                           :request-method :post
+                                           :params {:task "garbage 3"})
                                   (request "/api/tasks")))]
-      (is (= {"2" {"task" "garbage 1"} "4" {"task" "garbage 2"}} 
-             (json/parse-string (:body response)))))))
+      (is (= 3 (count (json/parse-string (:body response))))))))

@@ -9,18 +9,22 @@
   (testing "No tasks."
     (is (empty? (core/get-tasks "bob"))))
   (testing "Add/Remove Tasks"
-    (core/add-task "bob" "Task One")
-    (is (= 1 (count (core/get-tasks "bob"))))
-    (core/add-task "steve" "Task Two")
-    (is (= 1 (count (core/get-tasks "bob"))))
-    (core/remove-task "bob" 1)
-    (is (= 0 (count (core/get-tasks "bob"))))))
+    (core/remove-task (core/add-task "bob" "Task One"))
+    (is (= 0 (count (core/get-tasks "bob")))))
+  (testing "Get Task"
+    (is (not (nil? (core/get-task (core/add-task "bob" "Task One")))))))
 
-;;(deftest test-mark-completion
-;;  (testing "Test Complete"
-;;    (core/add-task "bob" "Task One")
-;;    (core/mark-complete "bob" 1)
-;;    (is (= {:task "Task One" :complete true} (core/get-task "bob" 1))))
-;;  (testing "Test Incomplete"
-;;    (core/mark-incomplete "bob" 1)
-;;    (is (= {:task "Task One" :complete false} (core/get-task "bob" 1)))))
+(deftest test-mark-completion
+  (testing "Test Complete"
+    (is (:task/completed
+         (core/get-task
+          (core/mark-incomplete
+           (core/mark-complete
+            (core/add-task "bob" "Task One")))))))
+  (testing "Test Incomplete"
+    (is (not 
+         (:task/completed
+          (core/get-task
+           (core/mark-incomplete
+            (core/mark-complete
+             (core/add-task "bob" "Task One")))))))))
