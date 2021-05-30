@@ -4,7 +4,8 @@
   :min-lein-version "2.0.0"
   :repositories {"cognitect-dev-tools"
                  {:url "https://dev-tools.cognitect.com/maven/releases/"
-                  :creds :gpg}}
+                  :username :env/datomic_user
+                  :password :env/datomic_user_pass}}
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]

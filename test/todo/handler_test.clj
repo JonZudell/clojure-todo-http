@@ -8,7 +8,7 @@
 (use-fixtures :each db/fixture-setup)
 
 (deftest test-app
-  (testing "main route"
+  (testing "simple route tests"
     (let [response (:response (-> (session app)
                                   (request "/login" 
                                            :request-method :post 
@@ -16,6 +16,13 @@
                                   (request "/api/whoami")))]
       (is (= (:status response) 200))
       (is (= (:body response) "bob"))
+      (not (nil? (:session response))))
+    (let [response (:response (-> (session app)
+                                  (request "/login"
+                                           :request-method :post
+                                           :params {:user "bob"})
+                                  (request "/api/task/complete-history")))]
+      (is (= (:status response) 200))
       (not (nil? (:session response)))))
   
   (testing "not-found route"

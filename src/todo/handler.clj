@@ -19,6 +19,8 @@
             {:body (whoami request)})
           (GET "/api/tasks"
             request {:body (core/get-tasks (whoami request))})
+          (GET "/api/task/complete-history"
+            request {:body (core/complete-history (whoami request))})
           (POST "/api/tasks"
             request {:body (core/add-task (whoami request)
                                           (-> request
