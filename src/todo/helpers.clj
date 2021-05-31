@@ -3,10 +3,21 @@
             [todo.db :as db]))
 (defn whoami [request] (-> request :session :user))
 
+(defn validate-email
+  [email]
+  (let [pattern #"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"]
+    (and (string? email) (re-matches pattern email))))
+
 (defn login [request]
   (let [user (get-in request [:params :user])
         session (get-in request [:session])]
-    {:body "Success" :session (assoc session :user user)}))
+    (if (validate-email user)
+      {:body "Success" :session (assoc session :user user)}
+      (-> (ring-response/response "User must be an email")
+          (ring-response/status 400)
+          (ring-response/content-type "text/plain")
+          (ring-response/charset "utf-8")))
+    ))
 
 (defn authorized? [request]
   (if (not (nil? (-> request :session :user)))

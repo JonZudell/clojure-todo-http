@@ -2,7 +2,6 @@
   (:require [clojure.test :refer [use-fixtures deftest testing is]]
             [todo.handler :refer [app]]
             [peridot.core :refer [request session]]
-            [cheshire.core :as json]
             [todo.db :as db]))
 
 (use-fixtures :each db/fixture-setup)
@@ -12,16 +11,16 @@
     (let [response (:response (-> (session app)
                                   (request "/login" 
                                            :request-method :post 
-                                           :params {:user "bob"})
+                                           :params {:user "bob@gmail.com"})
                                   (request "/api/whoami")))]
       (is (= (:status response) 200))
-      (is (= (:body response) "bob"))
+      (is (= (:body response) "bob@gmail.com"))
       (not (nil? (:session response))))
     (let [response (:response (-> (session app)
                                   (request "/login"
                                            :request-method :post
-                                           :params {:user "bob"})
-                                  (request "/api/task/complete-history")))]
+                                           :params {:user "bob@gmail.com"})
+                                  (request "/api/tasks/complete-history")))]
       (is (= (:status response) 200))
       (not (nil? (:session response)))))
   
@@ -46,52 +45,9 @@
     (let [response (:response (-> (session app)
                                   (request "/login"
                                            :request-method :post
-                                           :params {:user "bob"})
+                                           :params {:user "bob@gmail.com"})
                                   (request "/api/tasks"
                                            :request-method :post
                                            :params {:task "tax"})))]
       (is (= (:status response) 200)))))
 
-(deftest test-unique-for-user
-  (testing "steves tasks"
-    (let [response (:response (-> (session app)
-                                  (request "/login" 
-                                           :request-method :post 
-                                           :params {:user "steve"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "tax 1"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "tax 2"})
-                                  (request "/api/tasks")))]
-      (is (= 2 (count (json/parse-string (:body response)))))))
-  (testing "bobs tasks"
-    (let [response (:response (-> (session app)
-                                  (request "/login"
-                                           :request-method :post
-                                           :params {:user "bob"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "garbage 1"})
-                                  (request "/api/tasks")))]
-      (is (= 1 (count (json/parse-string (:body response)))))))
-  (testing "steve bob exclusive"
-    (let [response (:response (-> (session app)
-                                  (request "/login"
-                                           :request-method :post
-                                           :params {:user "steve"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "tax 2"})
-                                  (request "/login"
-                                           :request-method :post
-                                           :params {:user "bob"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "garbage 2"})
-                                  (request "/api/tasks"
-                                           :request-method :post
-                                           :params {:task "garbage 3"})
-                                  (request "/api/tasks")))]
-      (is (= 3 (count (json/parse-string (:body response))))))))

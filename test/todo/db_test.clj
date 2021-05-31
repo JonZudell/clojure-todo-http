@@ -16,11 +16,11 @@
                               :where [?t :task/user "jon"]]
                             (d/db db/conn)))))
     (is (= nil (first(d/q '[:find (count ?t)
-                            :where [?t :task/user "stebe"]]
+                            :where [?t :task/user "steve@hotmail.com"]]
                           (d/db db/conn)))))
-    (d/transact db/conn {:tx-data [{:task/user "stebe"
-                                    :task/description "sbuba"
+    (d/transact db/conn {:tx-data [{:task/user "steve@hotmail.com"
+                                    :task/description "scuba"
                                     :task/completed false}]})
     (is (= [1]  (first(d/q '[:find (count ?t)
-                             :where [?t :task/user "stebe"]]
+                             :where [?t :task/user "steve@hotmail.com"]]
                            (d/db db/conn)))))))

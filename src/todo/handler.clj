@@ -19,22 +19,34 @@
             {:body (whoami request)})
           (GET "/api/tasks"
             request {:body (core/get-tasks (whoami request))})
-          (GET "/api/task/complete-history"
-            request {:body (core/complete-history (whoami request))})
           (POST "/api/tasks"
-            request {:body (core/add-task (whoami request)
-                                          (-> request
+            request {:body {:external-use-id
+                            (core/add-task (whoami request)
+                                           (-> request
+                                               :params
+                                               :task))}})
+          (GET "/api/tasks/complete-history"
+            request {:body (core/complete-history (whoami request))})
+          (GET "/api/tasks/complete-count"
+            request {:body (core/get-complete-counts (whoami request))})
+          (GET "/api/tasks/incomplete-count"
+            request {:body (core/get-incomplete-counts (whoami request))})
+          (GET "/api/tasks/:external-use-id"
+            request {:body (core/get-task (-> request
                                               :params
-                                              :task))})
-          (DELETE "/api/tasks/:task-id"
-            request {:body (core/remove-task (whoami request)
-                                             (Integer/parseInt (:task-id request)))})
-          (PUT "/api/tasks/:task-id/complete"
-            request {:body (core/mark-complete (whoami request)
-                                               (Integer/parseInt (:task-id request)))})
-          (PUT "/api/tasks/:task-id/incomplete"
-            request {:body (core/mark-incomplete (whoami request)
-                                                 (Integer/parseInt (:task-id request)))})))
+                                              :external-use-id))})
+          (DELETE "/api/tasks/:external-use-id"
+            request {:body (core/remove-task (-> request
+                                                 :params
+                                                 :external-use-id))})
+          (PUT "/api/tasks/:external-use-id/complete"
+            request {:body (core/mark-complete (-> request
+                                                   :params
+                                                   :external-use-id))})
+          (PUT "/api/tasks/:external-use-id/incomplete"
+            request {:body (core/mark-incomplete (-> request
+                                                     :params
+                                                     :external-use-id))})))
 
 (def app
      (-> (routes (-> protected-routes

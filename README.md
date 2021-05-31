@@ -11,31 +11,18 @@ Requirements:
 - [x] View a chart comparing the number of complete vs. incomplete tasks
 - [x] View a burn-down chart showing the addition and completion/deletion of tasks over time (that is, at every moment a task was added, the chart should step up by one, and every moment a task was completed or deleted, the chart should step down by one)
 
+Possible Improvements:
+ - [] Implement input validation on http routes with clojure.spec
+ - [] Create a EDN serialization middleware to replace the JSON middleware
+ - [] Configure github workflow to deploy the application to aws
+
 ## Prerequisites
 
 You will need [Leiningen][] 2.0.0 or above installed.
 
 [leiningen]: https://github.com/technomancy/leiningen
 
-## Build requirements
-
-In order to build this project you will need to:
- - setup gpg keys for leiningen.
- - Request a licence for https://cognitect.com/dev-tools
-
-~/.lein/credentials.clj
-```
-;; ~/.lein/credentials.clj.gpg (see the Leiningen deploy authentication docs)
-{#"my\.datomic\.com" {:username "<DATOMIC_USERNAME>"
-                      :password "<DATOMIC_PASSWORD>"}}
-```
-
-Create a gpg key `gpg --gen-key`
-
-Encrypt your credentials with gpg `gpg --default-recipient-self -e ~/.lein/credentials.clj > ~/.lein/credentials.clj.gpg`
-
-### TODO:
-Add gpg key to github secrets and adjust workflow for lein to use it.
+In order to build this project you will need to set environment variables for `DATOMIC_USER` and `DATOMIC_USER_PASS`
 
 ## Running
 
@@ -45,10 +32,10 @@ To start a web server for the application, run:
 
 ## Testing
 
+To run tests once
+
+    lein test
+
 To rerun tests on every file change
 
     lein test-refresh
-
-## License
-
-Copyright © 2021 FIXME
