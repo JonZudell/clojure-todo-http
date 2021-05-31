@@ -12,9 +12,9 @@ Requirements:
 - [x] View a burn-down chart showing the addition and completion/deletion of tasks over time (that is, at every moment a task was added, the chart should step up by one, and every moment a task was completed or deleted, the chart should step down by one)
 
 Possible Improvements:
- - [] Implement input validation on http routes with clojure.spec
- - [] Create a EDN serialization middleware to replace the JSON middleware
- - [] Configure github workflow to deploy the application to aws
+ - Implement input validation on http routes with clojure.spec
+ - Create a EDN serialization middleware to replace the JSON middleware
+ - Configure github workflow to deploy the application to aws
 
 ## Prerequisites
 
