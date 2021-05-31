@@ -1,5 +1,6 @@
 (ns todo.core (:require [datomic.client.api :as d]
                         [todo.db :as db]))
+
 (defn get-task 
   "Get a single task by external use id"
   [external-use-id]
@@ -22,7 +23,7 @@
        (d/db db/conn) user))
 
 (defn get-complete-counts
-  "Get a map showing counts of (complete or deleted )/incomplete tasks."
+  "Get a count of complete tasks for a user."
   [user]
   (first (d/q '[:find (count ?complete)
                 :with ?c
@@ -33,7 +34,7 @@
        (d/db db/conn) user)))
 
 (defn get-incomplete-counts
-  "Get a map showing counts of (complete or deleted )/incomplete tasks."
+  "Get a count of incomplete tasks for a user."
   [user]
   (first (d/q '[:find (count ?incomplete)
                 :with ?i

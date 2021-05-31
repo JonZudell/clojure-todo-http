@@ -11,7 +11,7 @@
 
 (def unprotected-routes 
   (routes (POST "/login" request login)
-          (GET "/api/server-error" [] (/ 0 1)) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
+          (GET "/api/server-error" [] (/ 1 0)) ;; I'd prefer to raise a generic exception than to trigger an arithmatic error
           (route/not-found "Not Found")))
 
 (def protected-routes
@@ -36,17 +36,20 @@
                                               :params
                                               :external-use-id))})
           (DELETE "/api/tasks/:external-use-id"
-            request {:body (core/remove-task (-> request
-                                                 :params
-                                                 :external-use-id))})
+            request {:body {:external-use-id (core/remove-task 
+                                              (-> request
+                                                  :params
+                                                  :external-use-id))}})
           (PUT "/api/tasks/:external-use-id/complete"
-            request {:body (core/mark-complete (-> request
-                                                   :params
-                                                   :external-use-id))})
+            request {:body {:external-use-id (core/mark-complete 
+                                              (-> request
+                                                  :params
+                                                  :external-use-id))}})
           (PUT "/api/tasks/:external-use-id/incomplete"
-            request {:body (core/mark-incomplete (-> request
-                                                     :params
-                                                     :external-use-id))})))
+            request {:body {:external-use-id (core/mark-incomplete 
+                                              (-> request
+                                                  :params
+                                                  :external-use-id))}})))
 
 (def app
      (-> (routes (-> protected-routes
